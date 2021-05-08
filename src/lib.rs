@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use rand::seq::SliceRandom;
 use std::env;
+use std::env::VarError;
 use std::error::Error;
 use std::fs;
 
@@ -43,11 +44,11 @@ fn validate(filename: &str) -> Result<(), &str> {
     Ok(())
 }
 
-fn create_path(filename: &str) -> Result<String, &str> {
+fn create_path(filename: &str) -> Result<String, VarError> {
     dotenv().ok();
 
     match env::var("PATH_TO_GO_FOLDER") {
-        Err(e) => Err(e).unwrap(),
+        Err(e) => Err(e),
         Ok(val) => Ok(val + filename),
     }
 }
