@@ -46,7 +46,7 @@ fn get_rand_line(filename: &str) -> Result<String, Box<dyn Error>> {
     let url = urls.choose(&mut rand::thread_rng());
 
     match url {
-        None => Err("File is empty".into()),
+        None => Err("Error with rand".into()),
         Some(item) => Ok(item.clone().to_string()),
     }
 }
