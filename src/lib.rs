@@ -1,8 +1,8 @@
+use dotenv::dotenv;
+use rand::seq::SliceRandom;
+use std::env;
 use std::error::Error;
 use std::fs;
-use rand::seq::SliceRandom;
-use dotenv::dotenv;
-use std::env;
 
 pub struct Config {
     pub filename: String,
@@ -20,15 +20,15 @@ impl Config {
     }
 }
 
-pub fn go(config: Config) -> Result<(), Box<dyn Error>> {    
+pub fn go(config: Config) -> Result<(), Box<dyn Error>> {
     // validate filname
     validate(&config.filename)?;
 
     // Create path to file
     let path = create_path(&config.filename)?;
 
-    // get one line from file
-    let url = get_rand_line(&config.filename)?;
+    // Get one line from file
+    let url = get_rand_line(&path)?;
 
     println!("{:?}", url);
 
@@ -47,15 +47,14 @@ fn create_path(filename: &str) -> Result<String, &str> {
     dotenv().ok();
 
     match env::var("PATH_TO_GO_FOLDER") {
-        Err(e) => Err(&e),
-        Ok(val) => mut val.push_str(filename),
+        Err(e) => Err(e).unwrap(),
+        Ok(val) => Ok(val + filename),
     }
 }
 
-fn get_rand_line(filename: &str) -> Result<String, Box<dyn Error>> {    
-    let path = format!("./go/{}", filename);
+fn get_rand_line(path: &str) -> Result<String, Box<dyn Error>> {
     let contents = fs::read_to_string(path)?;
-    
+
     let urls: Vec<&str> = contents.split('\n').collect();
     let url = urls.choose(&mut rand::thread_rng());
 
