@@ -28,10 +28,13 @@ pub fn go(config: Config) -> Result<(), Box<dyn Error>> {
     // Create path to file
     let path = create_path(&config.filename)?;
 
-    // Get one line from file
-    let url = get_rand_line(&path)?;
+    // Get contents
+    let contents = fs::read_to_string(path)?;
 
-    println!("{:?}", url);
+    // Get one line from contents
+    let line = get_rand_line(&contents)?;
+
+    println!("{:?}", line);
 
     Ok(())
 }
@@ -53,14 +56,18 @@ fn create_path(filename: &str) -> Result<String, VarError> {
     }
 }
 
-fn get_rand_line(path: &str) -> Result<String, Box<dyn Error>> {
-    let contents = fs::read_to_string(path)?;
-
+fn get_rand_line(contents: &str) -> Result<String, &str> {
     let urls: Vec<&str> = contents.split('\n').collect();
     let url = urls.choose(&mut rand::thread_rng());
 
-    match url {
-        None => Err("Error with rand".into()),
-        Some(item) => Ok(item.clone().to_string()),
-    }
+    let url = match url {
+        None => return Err("Error with rand"),
+        Some(item) => item.clone().to_string(),
+    };
+
+    return if url.is_empty() {
+        Err("File is empty")
+    } else {
+        Ok(url)
+    };
 }
