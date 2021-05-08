@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::fs;
 use rand::seq::SliceRandom;
+use dotenv::dotenv;
+use std::env;
 
 pub struct Config {
     pub filename: String,
@@ -22,6 +24,9 @@ pub fn go(config: Config) -> Result<(), Box<dyn Error>> {
     // validate filname
     validate(&config.filename)?;
 
+    // Create path to file
+    let path = create_path(&config.filename)?;
+
     // get one line from file
     let url = get_rand_line(&config.filename)?;
 
@@ -36,6 +41,15 @@ fn validate(filename: &str) -> Result<(), &str> {
     // }
 
     Ok(())
+}
+
+fn create_path(filename: &str) -> Result<String, &str> {
+    dotenv().ok();
+
+    match env::var("PATH_TO_GO_FOLDER") {
+        Err(e) => Err(&e),
+        Ok(val) => mut val.push_str(filename),
+    }
 }
 
 fn get_rand_line(filename: &str) -> Result<String, Box<dyn Error>> {    
